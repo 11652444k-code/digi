@@ -805,11 +805,11 @@ button {
     }
 
     .about-image {
-        order: 1;
+        order: 2;
     }
 
     .about-text {
-        order: 2;
+        order: 1;
     }
 
     .gallery-item.large {
