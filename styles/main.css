@@ -2,27 +2,30 @@
    でじるみ ポートフォリオ - Main Styles
    =================================== */
 
-/* Last Update: 2026-02-02 11:47:00 */
+/* Last Update: 2026-02-02 16:47:00 - IRIAM Style */
 /* ===== CSS Custom Properties ===== */
 :root {
-    /* Colors - Light Cyan Theme */
-    --color-bg-primary: #e0f7fa;
-    --color-bg-secondary: #b2ebf2;
-    --color-bg-tertiary: #80deea;
-    --color-bg-card: #ffffff;
+    /* Colors - Dark Neon Gradient Theme (IRIAM Style) */
+    --color-bg-primary: #0d0d1a;
+    --color-bg-secondary: #13132b;
+    --color-bg-tertiary: #1a1a3e;
+    --color-bg-card: rgba(26, 26, 62, 0.8);
 
-    --color-text-primary: #0f172a;
-    --color-text-secondary: #334155;
-    --color-text-muted: #64748b;
+    --color-text-primary: #ffffff;
+    --color-text-secondary: #c4b5fd;
+    --color-text-muted: #a78bfa;
 
-    --color-accent-primary: #0891b2;
+    --color-accent-primary: #ec4899;
+    /* Hot Pink */
+    --color-accent-secondary: #06b6d4;
     /* Cyan */
-    --color-accent-secondary: #ea580c;
-    /* Vivid Orange */
-    --color-accent-gradient: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+    --color-accent-tertiary: #a855f7;
+    /* Purple */
+    --color-accent-gradient: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #06b6d4 100%);
+    --color-neon-glow: 0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
 
-    --color-border: rgba(8, 145, 178, 0.3);
-    --color-overlay: rgba(224, 247, 250, 0.85);
+    --color-border: rgba(168, 85, 247, 0.3);
+    --color-overlay: rgba(13, 13, 26, 0.9);
 
     /* Typography */
     --font-primary: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
@@ -175,7 +178,7 @@ button {
     font-size: var(--text-sm);
     font-weight: 500;
     color: var(--color-text-secondary);
-    transition: color var(--transition-fast);
+    transition: color var(--transition-fast), text-shadow var(--transition-fast);
     position: relative;
 }
 
@@ -186,8 +189,9 @@ button {
     left: 0;
     width: 0;
     height: 2px;
-    background: var(--color-accent-primary);
+    background: var(--color-accent-gradient);
     transition: width var(--transition-base);
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
 }
 
 .nav-link:hover,
@@ -229,18 +233,26 @@ button {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(224, 247, 250, 0.5), rgba(224, 247, 250, 0.5)),
+        radial-gradient(ellipse at 20% 80%, rgba(236, 72, 153, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(6, 182, 212, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.3) 0%, transparent 60%),
         url('../assets/images/hero-bg-custom.png') no-repeat center center;
     background-size: cover;
-    filter: saturate(0.8);
+    filter: saturate(1.2) brightness(0.8);
+}
+
+.hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, var(--color-bg-primary) 100%);
 }
 
 .hero-bg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at center, transparent 0%, var(--color-bg-primary) 100%);
-    backdrop-filter: blur(2px);
+    background: radial-gradient(circle at center, transparent 30%, var(--color-bg-primary) 100%);
 }
 
 .hero-content {
@@ -252,11 +264,11 @@ button {
 .hero-title {
     font-family: var(--font-display);
     font-size: clamp(var(--text-4xl), 8vw, var(--text-5xl));
-    font-weight: 800;
+    font-weight: 900;
     line-height: 1.1;
     margin-bottom: var(--space-4);
     letter-spacing: -0.02em;
-    text-shadow: 0 4px 12px rgba(224, 247, 250, 0.8);
+    text-shadow: 0 0 30px rgba(236, 72, 153, 0.5), 0 0 60px rgba(168, 85, 247, 0.3);
 }
 
 .title-accent {
@@ -264,6 +276,19 @@ button {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    animation: neonPulse 3s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.2);
+    }
 }
 
 .hero-subtitle {
@@ -416,7 +441,8 @@ button {
     overflow: hidden;
     aspect-ratio: 4 / 3;
     cursor: pointer;
-    transition: transform var(--transition-base);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    border: 1px solid var(--color-border);
 }
 
 .gallery-item.large {
@@ -424,7 +450,9 @@ button {
 }
 
 .gallery-item:hover {
-    transform: translateY(-4px);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.4), 0 0 60px rgba(168, 85, 247, 0.2);
+    border-color: var(--color-accent-primary);
 }
 
 .gallery-image {
@@ -443,7 +471,7 @@ button {
 .work-caption {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.4) 50%, transparent 100%);
+    background: linear-gradient(to top, rgba(13, 13, 26, 0.95) 0%, rgba(13, 13, 26, 0.5) 50%, transparent 100%);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -535,8 +563,8 @@ button {
 }
 
 .video-item:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
+    transform: translateY(-8px);
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.4), 0 0 60px rgba(168, 85, 247, 0.2);
 }
 
 .video-item.featured {
@@ -595,11 +623,14 @@ button {
     background: var(--color-bg-card);
     border-radius: var(--radius-xl);
     overflow: hidden;
-    transition: transform var(--transition-base);
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+    border: 1px solid var(--color-border);
 }
 
 .illustration-card:hover {
-    transform: scale(1.02);
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(236, 72, 153, 0.4), 0 0 60px rgba(168, 85, 247, 0.2);
+    border-color: var(--color-accent-primary);
 }
 
 .illustration-card .placeholder-image {
@@ -762,12 +793,13 @@ button {
     padding: var(--space-8);
     text-align: center;
     transition: all var(--transition-base);
+    backdrop-filter: blur(10px);
 }
 
 .contact-card:hover {
     border-color: var(--color-accent-primary);
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(34, 211, 238, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 0 40px rgba(236, 72, 153, 0.3), 0 0 80px rgba(168, 85, 247, 0.15);
 }
 
 .contact-icon {
@@ -802,9 +834,10 @@ button {
 }
 
 .contact-link:hover {
-    background: var(--color-accent-primary);
+    background: var(--color-accent-gradient);
+    border-color: transparent;
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
 }
 
 /* ===== Footer ===== */
