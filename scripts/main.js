@@ -1,5 +1,5 @@
 /* ===================================
-   でじるみ ポートフォリオ - JavaScript
+   DIGI ポートフォリオ - JavaScript
    =================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,7 +23,7 @@ function initTypewriter() {
         'Design 🎨',
         'Video 🎬',
         'Illustration 🖌️',
-        'でじるみ 💜'
+        'DIGI ✨'
     ];
 
     let phraseIndex = 0;
