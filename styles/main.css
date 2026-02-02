@@ -2,30 +2,30 @@
    でじるみ ポートフォリオ - Main Styles
    =================================== */
 
-/* Last Update: 2026-02-02 16:47:00 - IRIAM Style */
+/* Last Update: 2026-02-02 16:52:00 - IRIAM Style Lighter */
 /* ===== CSS Custom Properties ===== */
 :root {
-    /* Colors - Dark Neon Gradient Theme (IRIAM Style) */
-    --color-bg-primary: #0d0d1a;
-    --color-bg-secondary: #13132b;
-    --color-bg-tertiary: #1a1a3e;
-    --color-bg-card: rgba(26, 26, 62, 0.8);
+    /* Colors - Lighter Neon Gradient Theme */
+    --color-bg-primary: #1e1b4b;
+    --color-bg-secondary: #2e2a5a;
+    --color-bg-tertiary: #3b3770;
+    --color-bg-card: rgba(59, 55, 112, 0.9);
 
     --color-text-primary: #ffffff;
-    --color-text-secondary: #c4b5fd;
-    --color-text-muted: #a78bfa;
+    --color-text-secondary: #e0e7ff;
+    --color-text-muted: #c7d2fe;
 
-    --color-accent-primary: #ec4899;
-    /* Hot Pink */
-    --color-accent-secondary: #06b6d4;
-    /* Cyan */
-    --color-accent-tertiary: #a855f7;
-    /* Purple */
-    --color-accent-gradient: linear-gradient(135deg, #ec4899 0%, #a855f7 50%, #06b6d4 100%);
-    --color-neon-glow: 0 0 20px rgba(236, 72, 153, 0.5), 0 0 40px rgba(168, 85, 247, 0.3);
+    --color-accent-primary: #f472b6;
+    /* Lighter Pink */
+    --color-accent-secondary: #22d3ee;
+    /* Brighter Cyan */
+    --color-accent-tertiary: #c084fc;
+    /* Lighter Purple */
+    --color-accent-gradient: linear-gradient(135deg, #f472b6 0%, #c084fc 50%, #22d3ee 100%);
+    --color-neon-glow: 0 0 20px rgba(244, 114, 182, 0.5), 0 0 40px rgba(192, 132, 252, 0.3);
 
-    --color-border: rgba(168, 85, 247, 0.3);
-    --color-overlay: rgba(13, 13, 26, 0.9);
+    --color-border: rgba(192, 132, 252, 0.4);
+    --color-overlay: rgba(30, 27, 75, 0.9);
 
     /* Typography */
     --font-primary: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
