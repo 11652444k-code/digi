@@ -228,9 +228,10 @@ button {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse at 20% 50%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(250, 204, 21, 0.1) 0%, transparent 40%),
-        linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+        linear-gradient(rgba(224, 247, 250, 0.4), rgba(224, 247, 250, 0.4)),
+        url('../assets/images/hero-bg-custom.png') no-repeat center center;
+    background-size: cover;
+    opacity: 0.8;
 }
 
 .hero-content {
