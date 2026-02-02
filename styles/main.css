@@ -269,11 +269,15 @@ button {
 }
 
 .title-accent {
-    background: var(--color-accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: neonPulse 3s ease-in-out infinite;
+    color: #ffffff;
+    font-size: clamp(3rem, 10vw, 5rem);
+    font-weight: 900;
+    text-shadow:
+        0 0 20px rgba(255, 107, 157, 0.8),
+        0 0 40px rgba(255, 217, 61, 0.6),
+        0 0 60px rgba(107, 203, 119, 0.4),
+        2px 2px 0 rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.05em;
 }
 
 @keyframes neonPulse {
