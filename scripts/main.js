@@ -6,7 +6,54 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initScrollAnimations();
     initSlider();
+    initTypewriter();
 });
+
+/* ===== Typewriter Effect ===== */
+function initTypewriter() {
+    const element = document.getElementById('typewriter');
+    if (!element) return;
+
+    const phrases = [
+        'Creative Works ✨',
+        'Design 🎨',
+        'Video 🎬',
+        'Illustration 🖌️',
+        'でじるみ 💜'
+    ];
+
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 100;
+
+    function type() {
+        const currentPhrase = phrases[phraseIndex];
+
+        if (isDeleting) {
+            element.textContent = currentPhrase.substring(0, charIndex - 1);
+            charIndex--;
+            typingSpeed = 50;
+        } else {
+            element.textContent = currentPhrase.substring(0, charIndex + 1);
+            charIndex++;
+            typingSpeed = 100;
+        }
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+            typingSpeed = 2000; // Wait before deleting
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            typingSpeed = 500; // Wait before typing next phrase
+        }
+
+        setTimeout(type, typingSpeed);
+    }
+
+    type();
+}
 
 /* ===== Navigation ===== */
 function initNavigation() {

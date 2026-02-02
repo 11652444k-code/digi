@@ -288,6 +288,46 @@ button {
     }
 }
 
+/* Typewriter Cursor */
+.typewriter-cursor {
+    display: inline-block;
+    font-weight: 100;
+    color: var(--color-accent-primary);
+    animation: blink 0.8s infinite, colorShift 3s infinite;
+    margin-left: 4px;
+}
+
+@keyframes blink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes colorShift {
+    0% {
+        color: #ff6b9d;
+    }
+
+    33% {
+        color: #ffd93d;
+    }
+
+    66% {
+        color: #6bcb77;
+    }
+
+    100% {
+        color: #ff6b9d;
+    }
+}
+
 .hero-subtitle {
     font-size: var(--text-2xl);
     font-weight: 500;
