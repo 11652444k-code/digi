@@ -7,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     initSlider();
     initTypewriter();
+    initParticles();
+    initMouseFollower();
+    initParallax();
+    initTextReveal();
 });
 
 /* ===== Typewriter Effect ===== */
@@ -237,3 +241,120 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
+/* ===== Particle Background ===== */
+function initParticles() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+
+    const particleContainer = document.createElement('div');
+    particleContainer.className = 'particles';
+    particleContainer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;';
+    hero.insertBefore(particleContainer, hero.firstChild);
+
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.cssText = `
+            position: absolute;
+            width: ${Math.random() * 10 + 5}px;
+            height: ${Math.random() * 10 + 5}px;
+            background: ${['#ff6b9d', '#ffd93d', '#6bcb77', '#22d3ee', '#c084fc'][Math.floor(Math.random() * 5)]};
+            border-radius: 50%;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            opacity: ${Math.random() * 0.6 + 0.2};
+            animation: particleFloat ${Math.random() * 10 + 10}s linear infinite;
+            animation-delay: ${Math.random() * 5}s;
+        `;
+        particleContainer.appendChild(particle);
+    }
+
+    // Add CSS animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+/* ===== Mouse Follower 3D Effect ===== */
+function initMouseFollower() {
+    const cards = document.querySelectorAll('.gallery-item, .video-item, .illustration-card, .contact-card');
+
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
+    });
+}
+
+/* ===== Parallax Scroll Effect ===== */
+function initParallax() {
+    const heroContent = document.querySelector('.hero-content');
+    const heroBg = document.querySelector('.hero-bg');
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        if (heroContent) {
+            heroContent.style.transform = `translateY(${scrollY * 0.5}px)`;
+        }
+        if (heroBg) {
+            heroBg.style.transform = `translateY(${scrollY * 0.3}px) scale(${1 + scrollY * 0.0005})`;
+        }
+    });
+}
+
+/* ===== Text Reveal Animation ===== */
+function initTextReveal() {
+    const sectionHeaders = document.querySelectorAll('.section-title');
+
+    sectionHeaders.forEach(header => {
+        const text = header.textContent;
+        header.innerHTML = '';
+        header.style.overflow = 'hidden';
+
+        [...text].forEach((char, i) => {
+            const span = document.createElement('span');
+            span.textContent = char === ' ' ? '\u00A0' : char;
+            span.style.cssText = `
+                display: inline-block;
+                opacity: 0;
+                transform: translateY(50px) rotate(10deg);
+                transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                transition-delay: ${i * 0.05}s;
+            `;
+            header.appendChild(span);
+        });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.querySelectorAll('span').forEach(span => {
+                    span.style.opacity = '1';
+                    span.style.transform = 'translateY(0) rotate(0deg)';
+                });
+            }
+        });
+    }, { threshold: 0.5 });
+
+    sectionHeaders.forEach(header => observer.observe(header));
+}
