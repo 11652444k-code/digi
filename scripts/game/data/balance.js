@@ -7,7 +7,7 @@ export const BALANCE = {
   waitingSlots: 4,
   jobMult: { favored: 3.0, neutral: 1.0, unfavored: 0.5 },
   costGrowth: 1.5,
-  adjacency: { factoryDormMult: 1.3, canteenNoiseMult: 0.5 },
+  adjacency: { factoryDormMult: 1.3, canteenNoiseMult: 0.5, smithNeighborMult: 1.2 },
   morale: { start: 100, decayPerSec: 0.2, recoverPerSec: 0.5, cookBonus: 1.5, lowThreshold: 50, offlineFloor: 10 },
   lifespan: { meanDays: 20, sdDays: 5, minDays: 8, warnDays: 3, farewellCostPerPrestige: 50 },
   offline: { maxSeconds: 8 * 3600, efficiency: 0.5 },

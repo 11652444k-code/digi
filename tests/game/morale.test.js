@@ -49,6 +49,17 @@ function addPerson(s, job, facilityId, morale = 100) {
   assert.equal(s.people[q].morale, 100);
 }
 
+// 飯屋で働く料理人は自マスの回復で逃亡しない
+{
+  const s = setup();
+  const c = placeFacility(s, 'canteen', 2, 2);
+  const cook = addPerson(s, 'cook', c, 60);
+  let escapes = 0;
+  for (let i = 0; i < 6000; i++) escapes += tickMorale(s, 0.1).filter((e) => e.type === 'escape').length;
+  assert.equal(escapes, 0);
+  assert.equal(s.people[cook].morale, 100);
+}
+
 // moraleWarn は 50 を下回った瞬間に施設ごと 1 回
 {
   const s = setup();

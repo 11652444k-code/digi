@@ -48,10 +48,23 @@ function hasNeighbor4OfType(state, f, type) {
   });
 }
 
+function hasSmith(state, f) {
+  return f.workers.some((pid) => state.people[pid] && state.people[pid].job === 'smith');
+}
+
+function hasSmithFactoryNeighbor4(state, f) {
+  const { w, h } = state.grid;
+  return neighbors4(f.x, f.y, w, h).some((c) => {
+    const n = facilityAt(state, c.x, c.y);
+    return n !== null && n.type === 'factory' && hasSmith(state, n);
+  });
+}
+
 /**
  * 施設の隣接効果。
- * A-01: factory の 4 近傍に dorm → incomeMult 1.3
- * A-03: canteen の 4 近傍に factory → noiseMult 0.5
+ * A-01: factory の 4 近傍に dorm → incomeMult ×1.3（バッジ '×1.3'）
+ * 鍛冶: factory の 4 近傍に鍛冶師が配属された factory → incomeMult ×1.2（バッジ '鍛冶+'）。A-01 と乗算
+ * A-03: canteen の 4 近傍に factory → noiseMult 0.5（バッジ '騒音'）
  * @returns {{incomeMult:number, noiseMult:number, badges:string[]}}
  */
 export function adjacencyFor(state, facilityId) {
@@ -59,8 +72,12 @@ export function adjacencyFor(state, facilityId) {
   const f = state.facilities[facilityId];
   if (!f) return result;
   if (f.type === 'factory' && hasNeighbor4OfType(state, f, 'dorm')) {
-    result.incomeMult = BALANCE.adjacency.factoryDormMult;
+    result.incomeMult *= BALANCE.adjacency.factoryDormMult;
     result.badges.push(`×${BALANCE.adjacency.factoryDormMult}`);
+  }
+  if (f.type === 'factory' && hasSmithFactoryNeighbor4(state, f)) {
+    result.incomeMult *= BALANCE.adjacency.smithNeighborMult;
+    result.badges.push('鍛冶+');
   }
   if (f.type === 'canteen' && hasNeighbor4OfType(state, f, 'factory')) {
     result.noiseMult = BALANCE.adjacency.canteenNoiseMult;
@@ -74,9 +91,9 @@ function hasCook(state, f) {
 }
 
 /**
- * 稼働中の飯屋（workers >= 1）ごとに 8 近傍の施設へ士気回復量を配る（A-02）。
+ * 稼働中の飯屋（workers >= 1）ごとに、自マス + 8 近傍の施設へ士気回復量を配る（A-02）。
+ * 飯屋自身の配属者（料理人など）も回復対象になる。
  * 回復量 = recoverPerSec × (cook 配属なら cookBonus) × noiseMult。複数飯屋は合算。
- * 飯屋自身のマスは 8 近傍に含まない。
  * @returns {Map<string, number>} facilityId -> 回復量/秒
  */
 export function canteenCoverage(state) {
@@ -86,7 +103,8 @@ export function canteenCoverage(state) {
   for (const f of Object.values(state.facilities)) {
     if (f.type !== 'canteen' || f.workers.length < 1) continue;
     const amount = m.recoverPerSec * (hasCook(state, f) ? m.cookBonus : 1) * adjacencyFor(state, f.id).noiseMult;
-    for (const c of neighbors8(f.x, f.y, w, h)) {
+    const cells = [{ x: f.x, y: f.y }, ...neighbors8(f.x, f.y, w, h)];
+    for (const c of cells) {
       const n = facilityAt(state, c.x, c.y);
       if (n) map.set(n.id, (map.get(n.id) || 0) + amount);
     }
