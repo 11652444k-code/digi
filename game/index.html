@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="魔王になって、街を作り、住人を働かせて育てる放置寄りの街づくりゲーム。">
+    <meta name="theme-color" content="#14111c">
+    <meta property="og:title" content="魔王の街づくり（仮）">
+    <meta property="og:description" content="魔王になって街を育てる、ブラウザで遊べる街づくりゲーム。">
+    <meta property="og:type" content="website">
+    <title>魔王の街づくり（仮）</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../styles/game/game.css">
+</head>
+
+<body>
+    <noscript><p class="mg-noscript">このゲームを遊ぶには JavaScript が必要です。</p></noscript>
+
+    <div id="mg-app">
+        <!-- ヘッダー -->
+        <header class="mg-header">
+            <div class="mg-stat" aria-label="所持金"><span class="mg-stat__icon" aria-hidden="true">💰</span><span id="mg-money" class="mg-stat__value">0</span><span class="mg-stat__unit">G</span></div>
+            <div class="mg-stat" aria-label="毎秒の収益"><span class="mg-stat__icon" aria-hidden="true">📈</span><span id="mg-income" class="mg-stat__value">+0</span><span class="mg-stat__unit">G/s</span></div>
+            <div class="mg-stat" aria-label="住人数と定員"><span class="mg-stat__icon" aria-hidden="true">👥</span><span id="mg-capacity" class="mg-stat__value">0 / 0</span></div>
+            <div class="mg-stat" aria-label="士気"><span class="mg-stat__icon" aria-hidden="true">😠</span><span id="mg-morale" class="mg-stat__value">100%</span></div>
+        </header>
+
+        <main class="mg-main">
+            <!-- 街パネル（デフォルト） -->
+            <section id="mg-panel-town" class="mg-panel mg-panel--town" aria-label="街">
+                <canvas id="mg-street" class="mg-street" width="480" height="120" aria-label="通り。歩いている人物をタップして勧誘します"></canvas>
+
+                <div id="mg-grid" class="mg-grid" role="group" aria-label="街グリッド 5×5">
+                <button type="button" class="mg-cell mg-cell--empty" data-x="0" data-y="0" aria-label="空きマス（1列1行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="1" data-y="0" aria-label="空きマス（2列1行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="2" data-y="0" aria-label="空きマス（3列1行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="3" data-y="0" aria-label="空きマス（4列1行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="4" data-y="0" aria-label="空きマス（5列1行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="0" data-y="1" aria-label="空きマス（1列2行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="1" data-y="1" aria-label="空きマス（2列2行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="2" data-y="1" aria-label="空きマス（3列2行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="3" data-y="1" aria-label="空きマス（4列2行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="4" data-y="1" aria-label="空きマス（5列2行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="0" data-y="2" aria-label="空きマス（1列3行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="1" data-y="2" aria-label="空きマス（2列3行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="2" data-y="2" aria-label="空きマス（3列3行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="3" data-y="2" aria-label="空きマス（4列3行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="4" data-y="2" aria-label="空きマス（5列3行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="0" data-y="3" aria-label="空きマス（1列4行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="1" data-y="3" aria-label="空きマス（2列4行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="2" data-y="3" aria-label="空きマス（3列4行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="3" data-y="3" aria-label="空きマス（4列4行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="4" data-y="3" aria-label="空きマス（5列4行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="0" data-y="4" aria-label="空きマス（1列5行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="1" data-y="4" aria-label="空きマス（2列5行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="2" data-y="4" aria-label="空きマス（3列5行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="3" data-y="4" aria-label="空きマス（4列5行）"></button>
+                <button type="button" class="mg-cell mg-cell--empty" data-x="4" data-y="4" aria-label="空きマス（5列5行）"></button>
+                </div>
+
+                <div id="mg-waiting" class="mg-waiting" role="group" aria-label="待機枠">
+            <button type="button" class="mg-slot mg-slot--empty" aria-label="待機枠 1（空）"></button>
+            <button type="button" class="mg-slot mg-slot--empty" aria-label="待機枠 2（空）"></button>
+            <button type="button" class="mg-slot mg-slot--empty" aria-label="待機枠 3（空）"></button>
+            <button type="button" class="mg-slot mg-slot--empty" aria-label="待機枠 4（空）"></button>
+                </div>
+
+                <ul id="mg-log" class="mg-log" aria-live="polite" aria-label="イベントログ">
+                    <li class="mg-log__item">魔王の街づくりへようこそ。</li>
+                </ul>
+            </section>
+
+            <!-- 建設パネル -->
+            <section id="mg-panel-build" class="mg-panel mg-panel--build" aria-label="建設" hidden>
+                <h2 class="mg-panel__title">建設</h2>
+                <p class="mg-panel__note">施設を選んで、街の空きマスをタップします。</p>
+                <ul id="mg-build-list" class="mg-list"></ul>
+            </section>
+
+            <!-- 魔王パネル -->
+            <section id="mg-panel-lord" class="mg-panel mg-panel--lord" aria-label="魔王" hidden>
+                <h2 class="mg-panel__title">魔王</h2>
+                <ul id="mg-lord-stats" class="mg-list"></ul>
+                <div id="mg-lord-actions" class="mg-panel__actions"></div>
+            </section>
+
+            <!-- 設定パネル -->
+            <section id="mg-panel-settings" class="mg-panel mg-panel--settings" aria-label="設定" hidden>
+                <h2 class="mg-panel__title">設定</h2>
+                <ul id="mg-settings-list" class="mg-list"></ul>
+                <div class="mg-panel__actions">
+                    <button type="button" id="mg-reset" class="mg-btn mg-btn--danger">最初からやり直す</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- 下部タブ -->
+        <nav id="mg-tabs" class="mg-tabs" role="tablist" aria-label="メニュー">
+            <button type="button" class="mg-tab mg-tab--active" role="tab" data-tab="town" aria-selected="true"><span class="mg-tab__icon" aria-hidden="true">🏘️</span><span class="mg-tab__label">街</span></button>
+            <button type="button" class="mg-tab" role="tab" data-tab="build" aria-selected="false"><span class="mg-tab__icon" aria-hidden="true">🔨</span><span class="mg-tab__label">建設</span></button>
+            <button type="button" class="mg-tab" role="tab" data-tab="lord" aria-selected="false"><span class="mg-tab__icon" aria-hidden="true">👿</span><span class="mg-tab__label">魔王</span></button>
+            <button type="button" class="mg-tab" role="tab" data-tab="settings" aria-selected="false"><span class="mg-tab__icon" aria-hidden="true">⚙️</span><span class="mg-tab__label">設定</span></button>
+        </nav>
+
+        <!-- 汎用モーダル -->
+        <div id="mg-modal" class="mg-modal" role="dialog" aria-modal="true" aria-labelledby="mg-modal-title" hidden>
+            <div class="mg-modal__card">
+                <h2 id="mg-modal-title" class="mg-modal__title"></h2>
+                <div id="mg-modal-body" class="mg-modal__body"></div>
+                <div id="mg-modal-actions" class="mg-modal__actions"></div>
+            </div>
+        </div>
+
+        <!-- 施設詳細ボトムシート -->
+        <div id="mg-sheet" class="mg-sheet" role="dialog" aria-modal="true" aria-labelledby="mg-sheet-title" hidden>
+            <div class="mg-sheet__panel">
+                <h2 id="mg-sheet-title" class="mg-sheet__title"></h2>
+                <div id="mg-sheet-body" class="mg-sheet__body"></div>
+                <div id="mg-sheet-actions" class="mg-sheet__actions"></div>
+            </div>
+        </div>
+
+        <!-- トースト -->
+        <div id="mg-toast" class="mg-toast" role="status" aria-live="polite"></div>
+
+        <!-- チュートリアル -->
+        <div id="mg-tutorial" class="mg-tutorial" hidden>
+            <div class="mg-tutorial__bubble">
+                <p id="mg-tutorial-text" class="mg-tutorial__text"></p>
+                <button type="button" id="mg-tutorial-skip" class="mg-tutorial__skip" aria-label="チュートリアルをスキップ">スキップ</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../scripts/game/main.js"></script>
+</body>
+
+</html>
