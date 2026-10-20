@@ -1283,3 +1283,14 @@ button {
         font-size: var(--text-xl);
     }
 }
+/* game card */
+.gallery-item.game-card .work-caption {
+    opacity: 1;
+}
+
+.game-card-link {
+    align-self: flex-start;
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-6);
+    animation: none;
+}
