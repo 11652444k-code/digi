@@ -97,7 +97,7 @@ try {
 
   // ステップ 2: 寮を建てる
   const capBefore = await page.textContent('#mg-capacity');
-  await S(() => { window.__mg.getState().money = 200; });
+  await S(() => { window.__mg.getState().money = 400; });
   check(await seen('.mg-tab[data-tab="build"].mg-highlight'), 'step 2 highlights the build tab');
   await page.click('.mg-tab[data-tab="build"]');
   await page.waitForSelector('#mg-build-list button[data-type="dorm"]:not([disabled])');
@@ -178,7 +178,7 @@ try {
   await page.click('.mg-cell[data-x="1"][data-y="0"]');
   await page.click('#mg-sheet-actions button:has-text("撤去")');
   await page.waitForSelector('#mg-modal:not([hidden])');
-  check(/返金 50 G/.test(await page.textContent('#mg-modal-body')), 'remove confirm shows the refund');
+  check(/返金 125 G/.test(await page.textContent('#mg-modal-body')), 'remove confirm shows the refund');
   const moneyBeforeRemove = await S(() => window.__mg.getState().money);
   await page.click('#mg-modal-actions button:has-text("撤去する")');
   await page.waitForTimeout(200);

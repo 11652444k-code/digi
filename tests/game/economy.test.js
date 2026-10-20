@@ -32,14 +32,14 @@ assert.equal(moraleMult(100), 1.0);
 // buildCost の成長
 {
   const s = createInitialState(NOW, { rng });
-  assert.equal(buildCost(s, 'stall'), 75, 'initial stall exists so n=1');
-  assert.equal(buildCost(s, 'dorm'), 100);
+  assert.equal(buildCost(s, 'stall'), 170, 'initial stall exists so n=1');
+  assert.equal(buildCost(s, 'dorm'), 250);
   placeFacility(s, 'dorm', 0, 0);
-  assert.equal(buildCost(s, 'dorm'), 150);
+  assert.equal(buildCost(s, 'dorm'), 425);
   placeFacility(s, 'dorm', 1, 0);
-  assert.equal(buildCost(s, 'dorm'), 225);
+  assert.equal(buildCost(s, 'dorm'), 723);
   placeFacility(s, 'dorm', 2, 0);
-  assert.equal(buildCost(s, 'dorm'), Math.ceil(100 * 1.5 ** 3));
+  assert.equal(buildCost(s, 'dorm'), Math.ceil(250 * 1.7 ** 3));
 }
 
 // 解禁と canBuild
@@ -56,7 +56,7 @@ assert.equal(moraleMult(100), 1.0);
   s.money = 1000;
   const r = build(s, 'stall', 0, 0, NOW);
   assert.equal(r.ok, true);
-  assert.equal(s.money, 1000 - 75);
+  assert.equal(s.money, 1000 - 170);
   assert.equal(r.events[0].type, 'build');
   assert.equal(s.grid.cells[0], r.facilityId);
   assert.equal(s.stats.built, 1);
@@ -74,7 +74,7 @@ assert.equal(moraleMult(100), 1.0);
   assert.equal(r.ok, true);
   assert.equal(r.events[0].type, 'recruit');
   assert.equal(s.people[r.personId].morale, 100);
-  assert.ok(s.people[r.personId].lifespan >= 8);
+  assert.ok(s.people[r.personId].lifespan >= 6);
   assert.equal(s.street.some((p) => p.id === merchant.id), false);
   assert.equal(recruit(s, 'nope', NOW, rng).reason, 'notfound');
 
@@ -136,7 +136,7 @@ assert.equal(moraleMult(100), 1.0);
   assert.equal(s.waiting.length, 2);
   const r = removeFacility(s, factoryId);
   assert.equal(r.ok, true);
-  assert.equal(s.money, 100);
+  assert.equal(s.money, 300);
   assert.equal(s.waiting.length, 4);
   assert.equal(r.events.filter((e) => e.type === 'escape').length, 1);
   assert.equal(s.stats.escaped, 1);

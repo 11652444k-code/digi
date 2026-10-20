@@ -57,10 +57,10 @@ export const JOB_IDS = Object.keys(JOBS);
 ### `data/facilities.js`
 ```js
 export const FACILITIES = {
-  stall:   { id:'stall',   label:'露店', icon:'🏪', kind:'income',  baseCost:50,  capacity:1, baseIncome:1, capacityBonus:0 },
-  factory: { id:'factory', label:'工場', icon:'🏭', kind:'income',  baseCost:200, capacity:3, baseIncome:2, capacityBonus:0 },
-  dorm:    { id:'dorm',    label:'寮',   icon:'🏠', kind:'support', baseCost:100, capacity:0, baseIncome:0, capacityBonus:6 },
-  canteen: { id:'canteen', label:'飯屋', icon:'🍲', kind:'support', baseCost:150, capacity:1, baseIncome:0, capacityBonus:0 },
+  stall:   { id:'stall',   label:'露店', icon:'🏪', kind:'income',  baseCost:100, capacity:1, baseIncome:1, capacityBonus:0 },
+  factory: { id:'factory', label:'工場', icon:'🏭', kind:'income',  baseCost:600, capacity:3, baseIncome:2, capacityBonus:0 },
+  dorm:    { id:'dorm',    label:'寮',   icon:'🏠', kind:'support', baseCost:250, capacity:0, baseIncome:0, capacityBonus:6 },
+  canteen: { id:'canteen', label:'飯屋', icon:'🍲', kind:'support', baseCost:400, capacity:1, baseIncome:0, capacityBonus:0 },
 };
 export const FACILITY_IDS = Object.keys(FACILITIES);
 export const BUILD_ORDER = ['stall','dorm','factory','canteen'];  // 建設タブの表示順
@@ -74,10 +74,10 @@ export const BALANCE = {
   secondsPerDay: 60,
   waitingSlots: 4,
   jobMult: { favored: 3.0, neutral: 1.0, unfavored: 0.5 },
-  costGrowth: 1.5,
+  costGrowth: 1.7,
   adjacency: { factoryDormMult: 1.3, canteenNoiseMult: 0.5 },
   morale: { start: 100, decayPerSec: 0.2, recoverPerSec: 0.5, cookBonus: 1.5, lowThreshold: 50, offlineFloor: 10 },
-  lifespan: { meanDays: 20, sdDays: 5, minDays: 8, warnDays: 3, farewellCostPerPrestige: 50 },
+  lifespan: { meanDays: 12, sdDays: 4, minDays: 6, warnDays: 3, farewellCostPerPrestige: 50 },
   offline: { maxSeconds: 8*3600, efficiency: 0.5 },
   prestige: { baseThreshold: 10000, growth: 3, incomeBonusPerCount: 0.1, startMoneyBonus: 200 },
   spawn: { maxOnStreet: 4, walkSeconds: 12, intervalMin: 3, intervalRand: 4, fullCapacityIntervalMult: 2, placeableBoost: 1.5 },
@@ -138,7 +138,7 @@ export function facilityIncome(state, facilityId) -> { perSecond, workers: [{per
 export function totalIncomePerSecond(state) -> number
 export function capacity(state) -> { used, max }          // used = 配属中 + waiting
 export function countFacilities(state, type) -> number
-export function buildCost(state, type) -> number          // ceil(baseCost × 1.5^(n))、n = 既存同種数
+export function buildCost(state, type) -> number          // ceil(baseCost × 1.7^(n))、n = 既存同種数
 export function isUnlockedFacility(state, type) -> boolean
 export function canBuild(state, type, x, y) -> { ok, reason }   // reason: 'locked'|'occupied'|'money'|'oob'
 export function build(state, type, x, y, now) -> { ok, reason, facilityId, events }

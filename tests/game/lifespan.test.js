@@ -16,23 +16,23 @@ function mulberry32(seed) {
   };
 }
 
-// rollLifespan: 下限 8、平均およそ 20、標準偏差およそ 5
+// rollLifespan: 下限 6、平均およそ 12、標準偏差およそ 4
 {
   const rng = mulberry32(42);
   const xs = Array.from({ length: 20000 }, () => rollLifespan(rng));
-  assert.ok(xs.every((x) => x >= 8 && Number.isFinite(x)));
+  assert.ok(xs.every((x) => x >= 6 && Number.isFinite(x)));
   const mean = xs.reduce((a, b) => a + b, 0) / xs.length;
   const sd = Math.sqrt(xs.reduce((a, b) => a + (b - mean) ** 2, 0) / xs.length);
-  assert.ok(Math.abs(mean - 20) < 0.3, `mean ${mean}`);
-  assert.ok(Math.abs(sd - 5) < 0.3, `sd ${sd}`);
+  assert.ok(Math.abs(mean - 12) < 0.3, `mean ${mean}`);
+  assert.ok(Math.abs(sd - 4) < 0.3, `sd ${sd}`);
   for (const v of [0, 0.25, 0.5, 0.999999]) {
     const x = rollLifespan(() => v);
-    assert.ok(Number.isFinite(x) && x >= 8, `rng ${v} -> ${x}`);
+    assert.ok(Number.isFinite(x) && x >= 6, `rng ${v} -> ${x}`);
   }
-  assert.equal(rollLifespan(() => 0), 20, 'u1=1-0 gives z=0 (mean)');
+  assert.equal(rollLifespan(() => 0), 12, 'u1=1-0 gives z=0 (mean)');
   let i = 0;
   const seq = [0.999999, 0.5]; // u1 small, cos(pi) = -1 -> far below mean -> clamped
-  assert.equal(rollLifespan(() => seq[i++]), 8);
+  assert.equal(rollLifespan(() => seq[i++]), 6);
 }
 
 function setup() {
