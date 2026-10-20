@@ -574,3 +574,40 @@ button:focus-visible {
     .mg-cell__icon { font-size: 24px; }
     .mg-header { padding: 0 8px; column-gap: 4px; }
 }
+
+/* added by UI wiring */
+/* 転生可能になったら魔王タブに赤い点 */
+.mg-tab { position: relative; }
+.mg-tab--alert::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: calc(50% - 18px);
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--mg-danger);
+}
+/* タブバーは sticky + z-index で独自の重なり文脈を作るため、ハイライト中はオーバーレイより上へ */
+.mg-tabs:has(.mg-highlight) { z-index: 56; }
+/* 収益のフロートテキスト（<em>。バッジの :nth-of-type と干渉しない要素型） */
+.mg-float {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    transform: translateX(-50%);
+    color: var(--mg-accent);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    white-space: nowrap;
+    pointer-events: none;
+    animation: mg-float 1s ease-out forwards;
+}
+@keyframes mg-float {
+    from { opacity: 1; transform: translate(-50%, 0); }
+    to { opacity: 0; transform: translate(-50%, -18px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .mg-float { display: none; }
+}
