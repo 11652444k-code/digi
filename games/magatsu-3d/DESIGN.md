@@ -1,7 +1,7 @@
 # 禍津の形代 3D — 設計書
 
 和風ホラー横スクロール「禍津の形代」の世界観を使った、ブラウザで動く **3D 一人称ホラー**。
-Three.js を CDN(importmap)から読むだけで、ビルド不要・画像なしでも動く。
+Three.js は `vendor/three.module.min.js` を同梱し importmap で読む(CDN 不要)。ビルド不要・画像なしでも動く。
 画像(スプライト)があれば差し替わる(2D版と同じ「画像が無ければコード描画に落ちる」思想)。
 
 ## 置き場所
@@ -18,7 +18,7 @@ Three.js を CDN(importmap)から読むだけで、ビルド不要・画像な�
 | スプライト差し替え | `src/sprites.js` + `assets/sprites/*.png` (任意) |
 | 動作確認 | `cd games/magatsu-3d && python3 -m http.server 8765` → http://localhost:8765/ |
 
-Three.js は `https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js` を importmap の `three` に割り当てる。
+Three.js は同梱の `./vendor/three.module.min.js`(0.170.0、MIT)を importmap の `three` に割り当てる(CDN 不要。このセッションの環境では CDN が遮断されていたため同梱に変更)。
 `three/addons/` は使わない(PointerLock も自前)。
 
 ## 遊び方(仕様)
@@ -202,7 +202,7 @@ export function makeBillboard(texture, heightMeters) // → THREE.Sprite(足元�
 
 ### `index.html`
 - `<meta charset="utf-8">`、viewport、タイトル「禍津の形代 3D」。
-- importmap: `{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }`。
+- importmap: `{ "imports": { "three": "./vendor/three.module.min.js" } }`。
 - `<canvas id="game">` 全画面、UI は `#ui` 内の div(HUD / 字幕 / ヒント / overlay 各画面)。フォント: Noto Serif JP(Google Fonts)+ゴシックのフォールバック。
 - 背景黒、UI は白の細い文字、赤 `#b3261e` をアクセント。
 - WebGL が無い場合のメッセージ。
