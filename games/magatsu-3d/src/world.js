@@ -332,7 +332,7 @@ export function buildWorld(scene, renderer) {
     paper: new THREE.MeshStandardMaterial({
       color: 0xf4f1e8, emissive: 0x2a2824, roughness: 0.9, metalness: 0, side: THREE.DoubleSide,
     }),
-    water: new THREE.MeshStandardMaterial({ color: 0x1b2228, roughness: 0.12, metalness: 0.35 }),
+    water: new THREE.MeshStandardMaterial({ color: 0x1b2228, roughness: 0.12, metalness: 0.35, emissive: 0x000000 }), // emissive=空の映り込み(setNight で更新)
     wire: new THREE.LineBasicMaterial({ color: 0x0c0b0b }),
   };
 
@@ -463,7 +463,7 @@ export function buildWorld(scene, renderer) {
   // 配置データ
   // ---------------------------------------------------------------------
   const waypoints = [
-    [0, -10], [-8, 5], [0, 25], [8, 45], [30, 25], [20, -5], [0, -25],
+    [0, -10], [-8, 5], [0, 25], [8, 45], [36, 30], [36, 8], [20, -5], [0, -25], // 廃屋(x20..32,z16..24)を東から回り込む
   ].map(([x, z]) => new THREE.Vector3(x, 0, z));
   const jizoSpawns = [
     [4, 50], [-4, 10], [5, -20], [-20, 45],
@@ -523,12 +523,12 @@ export function buildWorld(scene, renderer) {
         tufts.push([x + (rand() - 0.5) * 0.3, z + (rand() - 0.5) * 0.3]);
       }
     }
-    const tuftGeo = new THREE.ConeGeometry(0.12, 0.5, 4).translate(0, 0.25, 0);
+    const tuftGeo = new THREE.ConeGeometry(0.06, 0.5, 4).translate(0, 0.25, 0);
     const rice = new THREE.InstancedMesh(tuftGeo, M.inst, tufts.length);
     tufts.forEach(([x, z], i) => {
       const s = 0.7 + rand() * 0.6;
       setInst(rice, i, x, -0.08, z, (rand() - 0.5) * 0.3, rand() * 6, (rand() - 0.5) * 0.3, s, s, s);
-      rice.setColorAt(i, _c.setHSL(0.2 + rand() * 0.05, 0.35, 0.16 + rand() * 0.06));
+      rice.setColorAt(i, _c.setHSL(0.24 + rand() * 0.05, 0.35, 0.1 + rand() * 0.04));
     });
     finishInst(rice);
     root.add(rice);
@@ -928,12 +928,12 @@ export function buildWorld(scene, renderer) {
       if (x > 1.8 && x < 27.5 && z > 23.5 && z < 28.2) continue;
       pts.push([x, z]);
     }
-    const grassGeo = new THREE.ConeGeometry(0.1, 0.4, 3).translate(0, 0.2, 0);
+    const grassGeo = new THREE.ConeGeometry(0.045, 0.4, 3).translate(0, 0.2, 0); // 細い葉(太いと黄色い棘に見える)
     const grass = new THREE.InstancedMesh(grassGeo, M.inst, pts.length);
     pts.forEach(([x, z], i) => {
       const s = 0.6 + rand() * 0.9;
       setInst(grass, i, x, 0, z, (rand() - 0.5) * 0.4, rand() * 6, (rand() - 0.5) * 0.4, s, s * (0.8 + rand() * 0.6), s);
-      grass.setColorAt(i, _c.setHSL(0.17 + rand() * 0.08, 0.3, 0.14 + rand() * 0.06));
+      grass.setColorAt(i, _c.setHSL(0.2 + rand() * 0.08, 0.28, 0.1 + rand() * 0.05));
     });
     finishInst(grass);
     root.add(grass);
@@ -1069,6 +1069,8 @@ export function buildWorld(scene, renderer) {
     ambient.intensity = lerp(DUSK.ambIntensity, NIGHT.ambIntensity, t);
     sun.color.lerpColors(DUSK.sunColor, NIGHT.sunColor, t);
     sun.intensity = lerp(DUSK.sunIntensity, NIGHT.sunIntensity, t);
+    // 田の水面: 環境マップが無いので地平の色を少し自発光させて「空の映り込み」に見せる
+    M.water.emissive.copy(cHor).multiplyScalar(0.35);
     sunDisc.material.opacity = 1 - t;
     sunDisc.visible = t < 0.999;
     moonDisc.material.opacity = t;
@@ -1086,7 +1088,7 @@ export function buildWorld(scene, renderer) {
         + 0.05 * Math.sin(time * 6.7 + p * 2.1)
         + 0.03 * Math.sin(time * 23.1 + p * 0.7);
       L.light.intensity = L.base * nf * f;
-      L.mat.emissiveIntensity = (0.6 + 1.4 * night) * f;
+      L.mat.emissiveIntensity = (0.55 + 0.45 * night) * f; // 上げすぎると白っぽく飛ぶ
     }
     for (const it of items) {
       const o = it.object;

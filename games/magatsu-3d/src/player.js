@@ -83,8 +83,8 @@ export class Player {
     camera.rotation.order = 'YXZ';
 
     // Flashlight (phone light): child of the camera.
-    const light = new THREE.SpotLight(0xfff2d0, 40, 30, 0.5, 0.6, 1.5);
-    // intensity 40: r170 uses physical units (candela); ~40 reads well at decay 1.5 over 30 m.
+    const light = new THREE.SpotLight(0xfff2d0, 16, 35, 0.5, 0.6, 0.6);
+    // r170 は物理単位(cd)。夜の霧(0.045)越しに道・電柱・敵が読めるよう 16 / decay 0.6(減衰を緩めて近距離の白飛びを防ぎつつ 10m 先の道も読める。ヘッドレス描画で確認)。
     light.position.set(0.15, -0.1, 0);
     light.castShadow = false;
     light.visible = false;

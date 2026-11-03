@@ -35,6 +35,7 @@ const overlays = [ui.title, ui.paused, ui.caught, ui.clear];
 
 function showOverlay(el) {
   for (const o of overlays) o.classList.toggle('show', o === el);
+  $('ui').classList.toggle('menu', el === ui.title); // タイトル画面では HUD を隠す
 }
 
 function showError(message) {
@@ -307,7 +308,7 @@ async function init() {
       flags.firstSeen = true;
       showLine('っ……誰かいる');
     }
-    if (!flags.jizoMoved && jizos.some((j) => j.hasMoved)) {
+    if (!flags.jizoMoved && jizos.some((j) => j.hasMoved && j.seen)) { // 動いた地蔵を目にしたとき
       flags.jizoMoved = true;
       showLine('今、動いた……?');
       audio.jizoMove();
@@ -394,8 +395,53 @@ async function init() {
     }
   }
 
+  // ---- デバッグ用フック(?debug のときだけ。ヘッドレス検証用) ----
+  if (location.search.includes('debug')) {
+    const v = (p) => ({ x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) });
+    window.__magatsu = {
+      get state() { return state; },
+      player, menkaburi, jizos, world, renderer, scene, camera,
+      forcePlay() {
+        state = 'playing';
+        showOverlay(null);
+        if (pendingStartLine) { pendingStartLine = false; showLine('……ここ、昼間と全然ちがう'); }
+      },
+      setNight(t) { night = t; nightStarted = true; world.setNight(t); },
+      teleport(x, z, yaw, pitch = 0) {
+        player.position.set(x, 1.6, z);
+        if (yaw !== undefined) player.yaw = yaw;
+        player.pitch = pitch;
+        player._applyRotation();
+      },
+      takeAll() {
+        for (const it of world.items) if (it.kind === 'katashiro') { it.taken = true; it.object.visible = false; }
+        katashiroCount = KATASHIRO_TOTAL;
+        nightStarted = true;
+      },
+      giveOfuda(n) { ofudaCount = n; },
+      freeze(on = true) { dbgFrozen = on; },
+      // 描画せずにゲーム時間を進める(ヘッドレスは fps が低いため)
+      advance(sec, dt = 1 / 60) {
+        for (let t = 0; t < sec && state === 'playing'; t += dt) { time += dt; updatePlaying(dt, time); input.endFrame(); }
+        updateHUD();
+        return state;
+      },
+      debug() {
+        return {
+          state, night, nightStarted, katashiroCount, ofudaCount,
+          player: v(player.position), yaw: player.yaw, stamina: player.stamina, flashlightOn: player.flashlightOn,
+          menkaburi: { state: menkaburi.state, pos: v(menkaburi.object.position), alert: menkaburi.alert, visible: menkaburi.object.visible, caught: menkaburi.caught },
+          jizos: jizos.map((j) => ({ state: j.state, pos: v(j.object.position), hasMoved: j.hasMoved, seen: j.seen })),
+          itemsVisible: world.items.filter((it) => it.object.visible).length,
+          calls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+        };
+      },
+    };
+  }
+
   let last = performance.now();
   let time = 0;
+  let dbgFrozen = false; // デバッグ用: 更新を止めて描画だけ
   function frame(now) {
     requestAnimationFrame(frame);
     const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
@@ -403,7 +449,7 @@ async function init() {
 
     if (input.pressed('KeyM')) audio.toggleMute();
 
-    if (state === 'playing') {
+    if (state === 'playing' && !dbgFrozen) {
       time += dt;
       updatePlaying(dt, time);
       updateHUD();

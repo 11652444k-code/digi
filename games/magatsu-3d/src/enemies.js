@@ -554,8 +554,8 @@ export class Jizo {
       dist = Math.hypot(dx, dz);
     }
 
-    // 常に主人公の方を向く(yaw のみ)
-    if (dist > 1e-3) this.object.rotation.y = Math.atan2(dx, dz);
+    // 見られていない間だけ主人公の方を向く(yaw のみ。見られている間は一切動かない)
+    if (!this.seen && dist > 1e-3) this.object.rotation.y = Math.atan2(dx, dz);
 
     const st = dist < JZ_AWAKE_DIST ? 'awake' : dist < JZ_SLIP_DIST ? 'slip' : 'sleep';
     if (st !== this.state) {
