@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>禍津の形代 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "./vendor/three.module.min.js" } }
+</script>
+<style>
+  :root {
+    --red: #b3261e;
+    --fg: #e8e4dc;
+    --dim: rgba(232, 228, 220, 0.55);
+    --serif: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "YuMincho", serif;
+    --gothic: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: #000; color: var(--fg);
+    font-family: var(--serif), var(--gothic);
+    font-weight: 400;
+    user-select: none; -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #000; }
+  #ui { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+
+  /* HUD */
+  .hud { position: absolute; font-size: 14px; letter-spacing: 0.12em; text-shadow: 0 0 6px #000, 0 0 2px #000; }
+  #hud-items { top: 16px; left: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .hud-row { display: flex; align-items: center; gap: 8px; }
+  .glyph { display: inline-block; flex: none; }
+  .glyph-katashiro {
+    width: 10px; height: 16px; background: #f2efe6;
+    clip-path: polygon(50% 0, 72% 14%, 62% 28%, 100% 40%, 66% 48%, 72% 100%, 54% 100%, 50% 64%, 46% 100%, 28% 100%, 34% 48%, 0 40%, 38% 28%, 28% 14%);
+  }
+  .glyph-ofuda {
+    width: 8px; height: 16px; background: #f2efe6;
+    box-shadow: inset 0 0 0 1px #f2efe6, inset 0 4px 0 0 var(--red);
+    border-bottom: 3px solid var(--red);
+  }
+  .hud-label { color: var(--dim); font-size: 12px; }
+  #hud-stamina { left: 16px; bottom: 18px; width: 140px; }
+  #stamina-track { height: 3px; background: rgba(255,255,255,0.12); overflow: hidden; }
+  #stamina-bar { height: 100%; width: 100%; background: rgba(232,228,220,0.75); transform-origin: left center; transition: background 0.3s; }
+  #stamina-bar.low { background: var(--red); }
+
+  #crosshair {
+    position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px;
+    border-radius: 50%; background: rgba(255,255,255,0.6);
+  }
+
+  #subtitle {
+    position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%);
+    width: max-content; max-width: calc(100% - 32px); text-align: center;
+    font-family: var(--serif); font-size: 20px; letter-spacing: 0.14em; line-height: 1.6;
+    text-shadow: 0 0 10px #000, 0 0 3px #000;
+    opacity: 0; transition: opacity 0.8s ease;
+  }
+  #subtitle.show { opacity: 1; }
+
+  #hint {
+    position: absolute; left: 50%; top: 62%; transform: translateX(-50%);
+    width: max-content; max-width: calc(100% - 32px); text-align: center;
+    font-family: var(--gothic); font-size: 13px; letter-spacing: 0.2em; color: var(--fg);
+    padding: 6px 14px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.35);
+    opacity: 0; transition: opacity 0.25s ease;
+  }
+  #hint.show { opacity: 1; }
+
+  #vignette {
+    position: absolute; inset: 0; opacity: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(110,10,8,0.55) 80%, rgba(80,0,0,0.9) 100%);
+  }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+
+  /* overlays */
+  .overlay {
+    position: absolute; inset: 0; display: none;
+    flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    padding: 24px 16px; text-align: center;
+    background: rgba(0, 0, 0, 0.72);
+    letter-spacing: 0.25em; pointer-events: auto; cursor: pointer;
+  }
+  .overlay.show { display: flex; }
+  .overlay .big { font-size: clamp(30px, 8vw, 64px); font-weight: 700; letter-spacing: 0.3em; margin: 0; line-height: 1.3; }
+  .overlay .prompt { font-size: 15px; color: var(--dim); animation: breathe 2.8s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+  #title { background: radial-gradient(ellipse at center, rgba(20,6,6,0.75) 0%, rgba(0,0,0,0.95) 75%); }
+  #title h1 { position: relative; }
+  #title h1 small {
+    font-size: 0.32em; color: var(--red); letter-spacing: 0.1em; vertical-align: super; margin-left: 0.2em;
+  }
+  #title .reading { font-size: 14px; color: var(--dim); letter-spacing: 0.6em; margin-top: -8px; }
+  #title .rule { width: 48px; height: 1px; background: var(--red); }
+  #title ul {
+    list-style: none; padding: 0; margin: 0; font-family: var(--gothic);
+    font-size: 12px; letter-spacing: 0.12em; line-height: 2; color: var(--dim);
+  }
+  #title ul b { color: var(--fg); font-weight: 400; display: inline-block; min-width: 6em; text-align: right; margin-right: 1em; }
+  #title .goal { font-size: 13px; letter-spacing: 0.15em; line-height: 1.8; }
+  #back {
+    position: absolute; left: 16px; top: 14px; font-size: 12px; letter-spacing: 0.15em;
+    color: var(--dim); text-decoration: none; font-family: var(--gothic);
+  }
+  #back:hover { color: var(--fg); }
+
+  #caught .big { color: var(--red); }
+  #caught { background: rgba(20, 0, 0, 0.78); }
+  #clear { background: rgba(10, 10, 16, 0.7); }
+
+  #nowebgl { cursor: default; }
+  #nowebgl p { font-size: 14px; line-height: 2; letter-spacing: 0.1em; max-width: 36em; white-space: pre-wrap; word-break: break-word; }
+
+  @media (max-width: 600px) {
+    #subtitle { font-size: 16px; bottom: 16%; }
+    #title ul { font-size: 11px; }
+    #title ul b { min-width: 5em; }
+    #title .reading { letter-spacing: 0.35em; }
+    .overlay { letter-spacing: 0.15em; }
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="ui">
+  <div id="vignette"></div>
+  <div id="flash"></div>
+
+  <div class="hud" id="hud-items">
+    <div class="hud-row"><span class="glyph glyph-katashiro"></span><span class="hud-label">形代</span><span id="hud-katashiro">0/5</span></div>
+    <div class="hud-row"><span class="glyph glyph-ofuda"></span><span class="hud-label">御札</span><span id="hud-ofuda">0</span></div>
+  </div>
+  <div class="hud" id="hud-stamina"><div id="stamina-track"><div id="stamina-bar"></div></div></div>
+  <div id="crosshair"></div>
+
+  <div id="subtitle"></div>
+  <div id="hint"></div>
+
+  <div class="overlay show" id="title">
+    <a id="back" href="../../">← ポートフォリオへ</a>
+    <h1 class="big">禍津の形代<small>3D</small></h1>
+    <div class="reading">まがつのかたしろ</div>
+    <div class="rule"></div>
+    <div class="goal">散らばった形代を五枚集め、社の祭壇に納めよ。</div>
+    <ul>
+      <li><b>WASD / 矢印</b>移動</li>
+      <li><b>Shift</b>走る</li>
+      <li><b>マウス</b>見回す</li>
+      <li><b>E</b>調べる / 拾う</li>
+      <li><b>F</b>ライト</li>
+      <li><b>M</b>消音</li>
+      <li><b>Esc</b>一時停止</li>
+    </ul>
+    <div class="prompt">クリックで始める</div>
+  </div>
+
+  <div class="overlay" id="paused">
+    <div class="prompt">クリックで再開</div>
+  </div>
+
+  <div class="overlay" id="caught">
+    <h2 class="big">捕まった</h2>
+    <div class="prompt">クリックでやり直す</div>
+  </div>
+
+  <div class="overlay" id="clear">
+    <h2 class="big">夜が明けた</h2>
+    <div class="prompt">もう一度</div>
+  </div>
+
+  <div class="overlay" id="nowebgl">
+    <p>この端末・ブラウザでは WebGL が使えないため、ゲームを表示できません。</p>
+  </div>
+</div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
