@@ -30,6 +30,9 @@ const ui = {
   katashiro: $('hud-katashiro'),
   ofuda: $('hud-ofuda'),
   stamina: $('stamina-bar'),
+  touchHint: $('touchhint'),
+  btnE: $('btnE'),
+  btnF: $('btnF'),
 };
 const overlays = [ui.title, ui.paused, ui.caught, ui.clear];
 
@@ -138,6 +141,8 @@ async function init() {
   let clearTimer = -1;     // >= 0 で祭壇に納めた後のカウントダウン中
   let flashLevel = 0;
   let pendingStartLine = true;
+  let dragHintShown = false; // 仮想ロック(ドラッグ視点)の案内は一度だけ
+  let actionAvailable = false; // E で拾える/納められる対象があるか(タッチの E ボタン用)
 
   function resetFlags() {
     flags = { autoLight: false, firstSeen: false, jizoMoved: false };
@@ -186,6 +191,10 @@ async function init() {
           showLine('……ここ、昼間と全然ちがう');
         }
       }
+      if (player.virtual && !input.isTouch && !dragHintShown) {
+        dragHintShown = true;
+        flashHint('ドラッグで視点移動', 3);
+      }
     } else if (state === 'playing') {
       state = 'paused';
       showOverlay(ui.paused);
@@ -204,6 +213,24 @@ async function init() {
     player.lock();
   }
   for (const o of overlays) o.addEventListener('click', onOverlayClick);
+
+  // ---- タッチ用の画面ボタン(E: 拾う/納める、F: ライト) ----
+  const tapKey = (btn, code) => btn.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (state === 'playing') input.inject(code);
+  });
+  tapKey(ui.btnE, 'KeyE');
+  tapKey(ui.btnF, 'KeyF');
+  const btnCache = { e: null, f: null, th: null };
+  function updateTouchUI() {
+    const touch = !!input.isTouch;
+    const showE = touch && state === 'playing' && actionAvailable;
+    const showF = touch && state === 'playing';
+    if (btnCache.e !== showE) { btnCache.e = showE; ui.btnE.classList.toggle('show', showE); }
+    if (btnCache.f !== showF) { btnCache.f = showF; ui.btnF.classList.toggle('show', showF); }
+    if (btnCache.th !== touch) { btnCache.th = touch; ui.touchHint.classList.toggle('show', touch); }
+  }
   canvas.addEventListener('click', (e) => {
     if (state !== 'playing') onOverlayClick(e);
     else if (!player.locked) player.lock();
@@ -317,6 +344,7 @@ async function init() {
     // アイテム・祭壇
     const pp = player.position;
     let hint = '';
+    actionAvailable = false;
     if (clearTimer < 0) {
       let nearest = null, best = PICKUP_RADIUS;
       for (const item of world.items) {
@@ -328,6 +356,7 @@ async function init() {
       const atAltar = katashiroCount >= KATASHIRO_TOTAL &&
         Math.hypot(ap.x - pp.x, ap.z - pp.z) <= world.altar.radius;
 
+      actionAvailable = atAltar || !!nearest;
       if (atAltar) {
         hint = 'E: 形代を納める';
         if (input.pressed('KeyE')) {
@@ -462,6 +491,7 @@ async function init() {
       ui.flash.style.opacity = String(flashLevel);
     }
 
+    updateTouchUI();
     audio.update(dt);
     renderer.render(scene, camera);
     input.endFrame();
